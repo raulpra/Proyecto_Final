@@ -1,0 +1,801 @@
+openapi: 3.0.1
+info:
+  title: STI — Sistema de Talleres Integrado
+  description: |
+    API REST para la gestión del ciclo de vida de reparaciones en un taller mecánico.
+    Incluye gestión de Clientes, Vehículos, Órdenes de Reparación y Usuarios.
+  version: "1.0.0"
+  contact:
+    name: STI Dev Team
+
+servers:
+  - url: http://localhost:8080
+    description: Servidor de desarrollo local
+
+tags:
+  - name: Clientes
+    description: Gestión de clientes del taller
+  - name: Vehículos
+    description: Gestión de vehículos vinculados a clientes
+  - name: Órdenes de Reparación
+    description: Gestión de órdenes de trabajo y reparaciones
+  - name: Usuarios
+    description: Gestión de usuarios y acceso al sistema
+
+paths:
+
+  # CLIENTES
+
+  /clientes:
+    get:
+      tags: [Clientes]
+      summary: Obtener todos los clientes
+      operationId: getAllClientes
+      responses:
+        "200":
+          description: Lista de clientes obtenida correctamente
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ClienteOutDto'
+
+    post:
+      tags: [Clientes]
+      summary: Crear un nuevo cliente
+      operationId: addCliente
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ClienteInDto'
+      responses:
+        "201":
+          description: Cliente creado correctamente
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ClienteOutDto'
+        "400":
+          description: Datos de entrada inválidos
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /clientes/{id}:
+    get:
+      tags: [Clientes]
+      summary: Obtener un cliente por ID
+      operationId: getClienteById
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        "200":
+          description: Cliente encontrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ClienteOutDto'
+        "404":
+          description: Cliente no encontrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+    put:
+      tags: [Clientes]
+      summary: Modificar un cliente existente
+      operationId: updateCliente
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ClienteInDto'
+      responses:
+        "200":
+          description: Cliente modificado correctamente
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ClienteOutDto'
+        "404":
+          description: Cliente no encontrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+    delete:
+      tags: [Clientes]
+      summary: Eliminar un cliente
+      operationId: deleteCliente
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        "204":
+          description: Cliente eliminado correctamente
+        "404":
+          description: Cliente no encontrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /clientes/{id}/vehiculos:
+    get:
+      tags: [Clientes]
+      summary: Obtener los vehículos de un cliente
+      operationId: getVehiculosByCliente
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        "200":
+          description: Lista de vehículos del cliente
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/VehiculoOutDto'
+        "404":
+          description: Cliente no encontrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  # VEHÍCULOS
+
+  /vehiculos:
+    get:
+      tags: [Vehículos]
+      summary: Obtener todos los vehículos
+      operationId: getAllVehiculos
+      responses:
+        "200":
+          description: Lista de vehículos
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/VehiculoOutDto'
+
+    post:
+      tags: [Vehículos]
+      summary: Registrar un nuevo vehículo
+      operationId: addVehiculo
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/VehiculoInDto'
+      responses:
+        "201":
+          description: Vehículo creado correctamente
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VehiculoOutDto'
+        "400":
+          description: Datos de entrada inválidos
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /vehiculos/{matricula}:
+    get:
+      tags: [Vehículos]
+      summary: Obtener un vehículo por matrícula
+      operationId: getVehiculoByMatricula
+      parameters:
+        - name: matricula
+          in: path
+          required: true
+          schema:
+            type: string
+          example: "1234ABC"
+      responses:
+        "200":
+          description: Vehículo encontrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VehiculoOutDto'
+        "404":
+          description: Vehículo no encontrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+    put:
+      tags: [Vehículos]
+      summary: Modificar un vehículo
+      operationId: updateVehiculo
+      parameters:
+        - name: matricula
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/VehiculoInDto'
+      responses:
+        "200":
+          description: Vehículo modificado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VehiculoOutDto'
+        "404":
+          description: Vehículo no encontrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+    delete:
+      tags: [Vehículos]
+      summary: Eliminar un vehículo
+      operationId: deleteVehiculo
+      parameters:
+        - name: matricula
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "204":
+          description: Vehículo eliminado correctamente
+        "404":
+          description: Vehículo no encontrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /vehiculos/{matricula}/ordenes:
+    get:
+      tags: [Vehículos]
+      summary: Historial de reparaciones por matrícula
+      operationId: getOrdenesByVehiculo
+      parameters:
+        - name: matricula
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Historial de órdenes del vehículo
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/OrdenReparacionOutDto'
+        "404":
+          description: Vehículo no encontrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  # ÓRDENES DE REPARACIÓN
+
+  /ordenes:
+    get:
+      tags: [Órdenes de Reparación]
+      summary: Obtener todas las órdenes de reparación
+      operationId: getAllOrdenes
+      responses:
+        "200":
+          description: Lista de órdenes
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/OrdenReparacionOutDto'
+
+    post:
+      tags: [Órdenes de Reparación]
+      summary: Crear una nueva orden de reparación
+      operationId: addOrden
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/OrdenReparacionInDto'
+      responses:
+        "201":
+          description: Orden creada correctamente
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrdenReparacionOutDto'
+        "400":
+          description: Datos de entrada inválidos
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /ordenes/{id}:
+    get:
+      tags: [Órdenes de Reparación]
+      summary: Obtener una orden por ID
+      operationId: getOrdenById
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        "200":
+          description: Orden encontrada
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrdenReparacionOutDto'
+        "404":
+          description: Orden no encontrada
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+    put:
+      tags: [Órdenes de Reparación]
+      summary: Modificar una orden de reparación
+      operationId: updateOrden
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/OrdenReparacionInDto'
+      responses:
+        "200":
+          description: Orden modificada correctamente
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrdenReparacionOutDto'
+        "404":
+          description: Orden no encontrada
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+    delete:
+      tags: [Órdenes de Reparación]
+      summary: Eliminar una orden de reparación
+      operationId: deleteOrden
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        "204":
+          description: Orden eliminada correctamente
+        "404":
+          description: Orden no encontrada
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  # USUARIOS
+
+  /usuarios:
+    get:
+      tags: [Usuarios]
+      summary: Obtener todos los usuarios
+      operationId: getAllUsuarios
+      responses:
+        "200":
+          description: Lista de usuarios
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/UsuarioOutDto'
+
+    post:
+      tags: [Usuarios]
+      summary: Crear un nuevo usuario
+      operationId: addUsuario
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UsuarioInDto'
+      responses:
+        "201":
+          description: Usuario creado correctamente
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UsuarioOutDto'
+        "400":
+          description: Datos de entrada inválidos
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /usuarios/{id}:
+    get:
+      tags: [Usuarios]
+      summary: Obtener un usuario por ID
+      operationId: getUsuarioById
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        "200":
+          description: Usuario encontrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UsuarioOutDto'
+        "404":
+          description: Usuario no encontrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+    put:
+      tags: [Usuarios]
+      summary: Modificar un usuario
+      operationId: updateUsuario
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UsuarioInDto'
+      responses:
+        "200":
+          description: Usuario modificado correctamente
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UsuarioOutDto'
+        "404":
+          description: Usuario no encontrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+    delete:
+      tags: [Usuarios]
+      summary: Eliminar un usuario
+      operationId: deleteUsuario
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        "204":
+          description: Usuario eliminado correctamente
+        "404":
+          description: Usuario no encontrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /usuarios/login:
+    post:
+      tags: [Usuarios]
+      summary: Validar acceso al sistema
+      operationId: loginUsuario
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginInDto'
+      responses:
+        "200":
+          description: Login correcto
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UsuarioOutDto'
+        "401":
+          description: Credenciales inválidas
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  # SCHEMAS
+
+components:
+  schemas:
+
+    ClienteInDto:
+      type: object
+      required: [dni, nombre, apellidos]
+      properties:
+        dni:
+          type: string
+          example: "12345678A"
+        nombre:
+          type: string
+          example: "Juan"
+        apellidos:
+          type: string
+          example: "García López"
+        email:
+          type: string
+          format: email
+          example: "juan.garcia@email.com"
+        telefono:
+          type: string
+          example: "666123456"
+        direccion:
+          type: string
+          example: "Calle Mayor 1, Madrid"
+
+    ClienteOutDto:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        dni:
+          type: string
+        nombre:
+          type: string
+        apellidos:
+          type: string
+        email:
+          type: string
+        telefono:
+          type: string
+        direccion:
+          type: string
+        fechaAlta:
+          type: string
+          format: date-time
+
+    VehiculoInDto:
+      type: object
+      required: [matricula, marca, modelo, clienteId]
+      properties:
+        matricula:
+          type: string
+          example: "1234ABC"
+        marca:
+          type: string
+          example: "Toyota"
+        modelo:
+          type: string
+          example: "Corolla"
+        anio:
+          type: integer
+          example: 2020
+        color:
+          type: string
+          example: "Blanco"
+        clienteId:
+          type: integer
+          format: int64
+          example: 1
+
+    VehiculoOutDto:
+      type: object
+      properties:
+        matricula:
+          type: string
+        marca:
+          type: string
+        modelo:
+          type: string
+        anio:
+          type: integer
+        color:
+          type: string
+        clienteId:
+          type: integer
+          format: int64
+        clienteNombre:
+          type: string
+
+    OrdenReparacionInDto:
+      type: object
+      required: [descripcionAveria, matriculaVehiculo]
+      properties:
+        descripcionAveria:
+          type: string
+          example: "Fallo en frenos delanteros"
+        estado:
+          type: string
+          enum: [PENDIENTE, EN_CURSO, FINALIZADO]
+          example: "PENDIENTE"
+        fechaEntrada:
+          type: string
+          format: date-time
+        fechaSalida:
+          type: string
+          format: date-time
+        kilometros:
+          type: integer
+          example: 45000
+        precioEstimado:
+          type: number
+          format: double
+          example: 250.00
+        precioFinal:
+          type: number
+          format: double
+          example: 230.00
+        matriculaVehiculo:
+          type: string
+          example: "1234ABC"
+
+    OrdenReparacionOutDto:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        descripcionAveria:
+          type: string
+        estado:
+          type: string
+          enum: [PENDIENTE, EN_CURSO, FINALIZADO]
+        fechaEntrada:
+          type: string
+          format: date-time
+        fechaSalida:
+          type: string
+          format: date-time
+        kilometros:
+          type: integer
+        precioEstimado:
+          type: number
+          format: double
+        precioFinal:
+          type: number
+          format: double
+        matriculaVehiculo:
+          type: string
+        marcaVehiculo:
+          type: string
+        modeloVehiculo:
+          type: string
+
+    UsuarioInDto:
+      type: object
+      required: [username, password]
+      properties:
+        username:
+          type: string
+          example: "tecnico01"
+        password:
+          type: string
+          example: "password123"
+        nombre:
+          type: string
+          example: "Pedro Martínez"
+        rol:
+          type: string
+          enum: [ADMIN, TECNICO]
+          example: "TECNICO"
+        activo:
+          type: boolean
+          example: true
+
+    UsuarioOutDto:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        username:
+          type: string
+        nombre:
+          type: string
+        rol:
+          type: string
+        activo:
+          type: boolean
+
+    LoginInDto:
+      type: object
+      required: [username, password]
+      properties:
+        username:
+          type: string
+          example: "admin"
+        password:
+          type: string
+          example: "admin123"
+
+    ErrorResponse:
+      type: object
+      properties:
+        code:
+          type: integer
+          example: 404
+        title:
+          type: string
+          example: "not-found"
+        message:
+          type: string
+          example: "Cliente no encontrado con ID: 1"
+        errors:
+          type: object
+          additionalProperties:
+            type: string
