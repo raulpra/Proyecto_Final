@@ -1,0 +1,9 @@
+.sti-footer {
+  background-color: var(--header-bg);
+  color: rgba(255, 255, 255, 0.35);
+  text-align: center;
+  padding: 14px 0;
+  font-size: 12px;
+  margin-top: auto;
+  border-top: 1px solid rgba(255,255,255,0.05);
+}
