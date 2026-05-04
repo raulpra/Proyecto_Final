@@ -1,0 +1,125 @@
+.sti-navbar {
+  background-color: var(--nav-bg);
+  border-bottom: 1px solid rgba(255,255,255,0.05);
+  padding: 0 28px;
+  height: 48px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.sti-navbar-inner {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  gap: 2px;
+}
+
+.nav-item-link {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  color: rgba(255,255,255,0.55);
+  font-size: 13px;
+  font-weight: 500;
+  padding: 6px 13px;
+  border-radius: var(--radius-sm);
+  text-decoration: none;
+  transition: color 0.15s, background-color 0.15s;
+  white-space: nowrap;
+}
+
+.nav-item-link svg {
+  width: 14px;
+  height: 14px;
+  stroke: currentColor;
+  fill: none;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  flex-shrink: 0;
+}
+
+.nav-item-link:hover {
+  color: rgba(255,255,255,0.9);
+  background-color: var(--nav-hover);
+}
+
+.nav-item-link.active {
+  color: #fff;
+  background-color: var(--nav-active-bg);
+}
+
+.nav-spacer { flex: 1; }
+
+.nav-user-info {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.nav-user-label {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  color: rgba(255,255,255,0.5);
+  font-size: 12px;
+}
+
+.nav-user-avatar {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background-color: var(--accent);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  flex-shrink: 0;
+}
+
+.nav-role-tag {
+  font-size: 10px;
+  font-weight: 700;
+  padding: 2px 6px;
+  border-radius: 4px;
+  background-color: rgba(37,99,168,0.35);
+  color: #93c5fd;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.btn-nav-logout {
+  background: transparent;
+  color: rgba(255,255,255,0.45);
+  border: 1px solid rgba(255,255,255,0.12);
+  border-radius: var(--radius-sm);
+  padding: 5px 12px;
+  font-size: 12px;
+  font-weight: 500;
+  font-family: 'Inter', sans-serif;
+  cursor: pointer;
+  transition: color 0.15s, border-color 0.15s, background-color 0.15s;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.btn-nav-logout svg {
+  width: 13px;
+  height: 13px;
+  stroke: currentColor;
+  fill: none;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.btn-nav-logout:hover {
+  color: rgba(255,255,255,0.85);
+  border-color: rgba(255,255,255,0.3);
+  background-color: rgba(255,255,255,0.06);
+}
