@@ -1,0 +1,618 @@
+{
+  "info": {
+    "name": "STI — Sistema de Talleres Integrado",
+    "description": "Colección completa de tests para la API STI. Incluye tests automáticos para validar status codes, estructura de respuesta y campos clave en cada endpoint.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "sti-api-v1"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:8080",
+      "type": "string"
+    },
+    {
+      "key": "clienteId",
+      "value": "1",
+      "type": "string"
+    },
+    {
+      "key": "vehiculoMatricula",
+      "value": "1234ABC",
+      "type": "string"
+    },
+    {
+      "key": "ordenId",
+      "value": "1",
+      "type": "string"
+    },
+    {
+      "key": "usuarioId",
+      "value": "1",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "Clientes",
+      "item": [
+        {
+          "name": "GET Todos los Clientes",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{baseUrl}}/clientes", "host": ["{{baseUrl}}"], "path": ["clientes"] }
+          },
+          "event": [{
+            "listen": "test",
+            "script": {
+              "exec": [
+                "pm.test('Status 200 OK', () => pm.response.to.have.status(200));",
+                "pm.test('Respuesta es un array', () => {",
+                "  const body = pm.response.json();",
+                "  pm.expect(body).to.be.an('array');",
+                "});"
+              ]
+            }
+          }]
+        },
+        {
+          "name": "POST Crear Cliente",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": { "raw": "{{baseUrl}}/clientes", "host": ["{{baseUrl}}"], "path": ["clientes"] },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"dni\": \"12345678A\",\n  \"nombre\": \"Juan\",\n  \"apellidos\": \"García López\",\n  \"email\": \"juan.garcia@email.com\",\n  \"telefono\": \"666123456\",\n  \"direccion\": \"Calle Mayor 1, Madrid\"\n}"
+            }
+          },
+          "event": [{
+            "listen": "test",
+            "script": {
+              "exec": [
+                "pm.test('Status 201 Created', () => pm.response.to.have.status(201));",
+                "pm.test('Tiene id y dni', () => {",
+                "  const body = pm.response.json();",
+                "  pm.expect(body).to.have.property('id');",
+                "  pm.expect(body).to.have.property('dni').eql('12345678A');",
+                "  pm.collectionVariables.set('clienteId', body.id);",
+                "});"
+              ]
+            }
+          }]
+        },
+        {
+          "name": "GET Cliente por ID",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{baseUrl}}/clientes/{{clienteId}}", "host": ["{{baseUrl}}"], "path": ["clientes", "{{clienteId}}"] }
+          },
+          "event": [{
+            "listen": "test",
+            "script": {
+              "exec": [
+                "pm.test('Status 200 OK', () => pm.response.to.have.status(200));",
+                "pm.test('Tiene dni correcto', () => {",
+                "  const body = pm.response.json();",
+                "  pm.expect(body).to.have.property('id');",
+                "  pm.expect(body).to.have.property('nombre');",
+                "});"
+              ]
+            }
+          }]
+        },
+        {
+          "name": "GET Cliente por ID — 404",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{baseUrl}}/clientes/99999", "host": ["{{baseUrl}}"], "path": ["clientes", "99999"] }
+          },
+          "event": [{
+            "listen": "test",
+            "script": {
+              "exec": [
+                "pm.test('Status 404 Not Found', () => pm.response.to.have.status(404));",
+                "pm.test('ErrorResponse tiene code 404', () => {",
+                "  const body = pm.response.json();",
+                "  pm.expect(body.code).to.eql(404);",
+                "  pm.expect(body.title).to.eql('not-found');",
+                "});"
+              ]
+            }
+          }]
+        },
+        {
+          "name": "PUT Modificar Cliente",
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": { "raw": "{{baseUrl}}/clientes/{{clienteId}}", "host": ["{{baseUrl}}"], "path": ["clientes", "{{clienteId}}"] },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"dni\": \"12345678A\",\n  \"nombre\": \"Juan Modificado\",\n  \"apellidos\": \"García López\",\n  \"email\": \"juan.mod@email.com\",\n  \"telefono\": \"666999888\",\n  \"direccion\": \"Calle Nueva 5, Madrid\"\n}"
+            }
+          },
+          "event": [{
+            "listen": "test",
+            "script": {
+              "exec": [
+                "pm.test('Status 200 OK', () => pm.response.to.have.status(200));",
+                "pm.test('Nombre modificado', () => {",
+                "  const body = pm.response.json();",
+                "  pm.expect(body.nombre).to.eql('Juan Modificado');",
+                "});"
+              ]
+            }
+          }]
+        },
+        {
+          "name": "GET Vehículos de un Cliente",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{baseUrl}}/clientes/{{clienteId}}/vehiculos", "host": ["{{baseUrl}}"], "path": ["clientes", "{{clienteId}}", "vehiculos"] }
+          },
+          "event": [{
+            "listen": "test",
+            "script": {
+              "exec": [
+                "pm.test('Status 200 OK', () => pm.response.to.have.status(200));",
+                "pm.test('Respuesta es un array', () => {",
+                "  pm.expect(pm.response.json()).to.be.an('array');",
+                "});"
+              ]
+            }
+          }]
+        },
+        {
+          "name": "DELETE Cliente",
+          "request": {
+            "method": "DELETE",
+            "url": { "raw": "{{baseUrl}}/clientes/{{clienteId}}", "host": ["{{baseUrl}}"], "path": ["clientes", "{{clienteId}}"] }
+          },
+          "event": [{
+            "listen": "test",
+            "script": {
+              "exec": [
+                "pm.test('Status 204 No Content', () => pm.response.to.have.status(204));"
+              ]
+            }
+          }]
+        }
+      ]
+    },
+    {
+      "name": "Vehículos",
+      "item": [
+        {
+          "name": "POST Crear Cliente para Vehículo",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": { "raw": "{{baseUrl}}/clientes", "host": ["{{baseUrl}}"], "path": ["clientes"] },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"dni\": \"87654321B\",\n  \"nombre\": \"María\",\n  \"apellidos\": \"Pérez Ruiz\",\n  \"email\": \"maria@email.com\",\n  \"telefono\": \"611222333\",\n  \"direccion\": \"Avenida Park 10\"\n}"
+            }
+          },
+          "event": [{
+            "listen": "test",
+            "script": {
+              "exec": [
+                "pm.test('Status 201', () => pm.response.to.have.status(201));",
+                "pm.collectionVariables.set('clienteId', pm.response.json().id);"
+              ]
+            }
+          }]
+        },
+        {
+          "name": "POST Crear Vehículo",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": { "raw": "{{baseUrl}}/vehiculos", "host": ["{{baseUrl}}"], "path": ["vehiculos"] },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"matricula\": \"1234ABC\",\n  \"marca\": \"Toyota\",\n  \"modelo\": \"Corolla\",\n  \"anio\": 2020,\n  \"color\": \"Blanco\",\n  \"clienteId\": {{clienteId}}\n}"
+            }
+          },
+          "event": [{
+            "listen": "test",
+            "script": {
+              "exec": [
+                "pm.test('Status 201 Created', () => pm.response.to.have.status(201));",
+                "pm.test('Tiene matrícula', () => {",
+                "  const body = pm.response.json();",
+                "  pm.expect(body.matricula).to.eql('1234ABC');",
+                "  pm.collectionVariables.set('vehiculoMatricula', body.matricula);",
+                "});"
+              ]
+            }
+          }]
+        },
+        {
+          "name": "GET Todos los Vehículos",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{baseUrl}}/vehiculos", "host": ["{{baseUrl}}"], "path": ["vehiculos"] }
+          },
+          "event": [{
+            "listen": "test",
+            "script": {
+              "exec": [
+                "pm.test('Status 200 OK', () => pm.response.to.have.status(200));",
+                "pm.test('Es un array', () => pm.expect(pm.response.json()).to.be.an('array'));"
+              ]
+            }
+          }]
+        },
+        {
+          "name": "GET Vehículo por Matrícula",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{baseUrl}}/vehiculos/{{vehiculoMatricula}}", "host": ["{{baseUrl}}"], "path": ["vehiculos", "{{vehiculoMatricula}}"] }
+          },
+          "event": [{
+            "listen": "test",
+            "script": {
+              "exec": [
+                "pm.test('Status 200 OK', () => pm.response.to.have.status(200));",
+                "pm.test('Tiene matrícula y marca', () => {",
+                "  const body = pm.response.json();",
+                "  pm.expect(body).to.have.property('matricula');",
+                "  pm.expect(body).to.have.property('marca');",
+                "});"
+              ]
+            }
+          }]
+        },
+        {
+          "name": "GET Vehículo por Matrícula — 404",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{baseUrl}}/vehiculos/NOEXISTE", "host": ["{{baseUrl}}"], "path": ["vehiculos", "NOEXISTE"] }
+          },
+          "event": [{
+            "listen": "test",
+            "script": {
+              "exec": [
+                "pm.test('Status 404', () => pm.response.to.have.status(404));"
+              ]
+            }
+          }]
+        },
+        {
+          "name": "PUT Modificar Vehículo",
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": { "raw": "{{baseUrl}}/vehiculos/{{vehiculoMatricula}}", "host": ["{{baseUrl}}"], "path": ["vehiculos", "{{vehiculoMatricula}}"] },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"matricula\": \"1234ABC\",\n  \"marca\": \"Toyota\",\n  \"modelo\": \"Corolla Cross\",\n  \"anio\": 2021,\n  \"color\": \"Gris\",\n  \"clienteId\": {{clienteId}}\n}"
+            }
+          },
+          "event": [{
+            "listen": "test",
+            "script": {
+              "exec": [
+                "pm.test('Status 200 OK', () => pm.response.to.have.status(200));",
+                "pm.test('Modelo modificado', () => {",
+                "  pm.expect(pm.response.json().modelo).to.eql('Corolla Cross');",
+                "});"
+              ]
+            }
+          }]
+        },
+        {
+          "name": "GET Historial Órdenes por Matrícula",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{baseUrl}}/vehiculos/{{vehiculoMatricula}}/ordenes", "host": ["{{baseUrl}}"], "path": ["vehiculos", "{{vehiculoMatricula}}", "ordenes"] }
+          },
+          "event": [{
+            "listen": "test",
+            "script": {
+              "exec": [
+                "pm.test('Status 200 OK', () => pm.response.to.have.status(200));",
+                "pm.test('Es un array', () => pm.expect(pm.response.json()).to.be.an('array'));"
+              ]
+            }
+          }]
+        },
+        {
+          "name": "DELETE Vehículo",
+          "request": {
+            "method": "DELETE",
+            "url": { "raw": "{{baseUrl}}/vehiculos/{{vehiculoMatricula}}", "host": ["{{baseUrl}}"], "path": ["vehiculos", "{{vehiculoMatricula}}"] }
+          },
+          "event": [{
+            "listen": "test",
+            "script": {
+              "exec": [
+                "pm.test('Status 204 No Content', () => pm.response.to.have.status(204));"
+              ]
+            }
+          }]
+        }
+      ]
+    },
+    {
+      "name": "Órdenes de Reparación",
+      "item": [
+        {
+          "name": "POST Crear Orden de Reparación",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": { "raw": "{{baseUrl}}/ordenes", "host": ["{{baseUrl}}"], "path": ["ordenes"] },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"descripcionAveria\": \"Fallo en frenos delanteros\",\n  \"estado\": \"PENDIENTE\",\n  \"kilometros\": 45000,\n  \"precioEstimado\": 250.00,\n  \"matriculaVehiculo\": \"{{vehiculoMatricula}}\"\n}"
+            }
+          },
+          "event": [{
+            "listen": "test",
+            "script": {
+              "exec": [
+                "pm.test('Status 201 Created', () => pm.response.to.have.status(201));",
+                "pm.test('Tiene id y estado', () => {",
+                "  const body = pm.response.json();",
+                "  pm.expect(body).to.have.property('id');",
+                "  pm.expect(body.estado).to.eql('PENDIENTE');",
+                "  pm.collectionVariables.set('ordenId', body.id);",
+                "});"
+              ]
+            }
+          }]
+        },
+        {
+          "name": "GET Todas las Órdenes",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{baseUrl}}/ordenes", "host": ["{{baseUrl}}"], "path": ["ordenes"] }
+          },
+          "event": [{
+            "listen": "test",
+            "script": {
+              "exec": [
+                "pm.test('Status 200 OK', () => pm.response.to.have.status(200));",
+                "pm.test('Es un array', () => pm.expect(pm.response.json()).to.be.an('array'));"
+              ]
+            }
+          }]
+        },
+        {
+          "name": "GET Orden por ID",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{baseUrl}}/ordenes/{{ordenId}}", "host": ["{{baseUrl}}"], "path": ["ordenes", "{{ordenId}}"] }
+          },
+          "event": [{
+            "listen": "test",
+            "script": {
+              "exec": [
+                "pm.test('Status 200 OK', () => pm.response.to.have.status(200));",
+                "pm.test('Tiene descripcionAveria', () => {",
+                "  pm.expect(pm.response.json()).to.have.property('descripcionAveria');",
+                "});"
+              ]
+            }
+          }]
+        },
+        {
+          "name": "PUT Cambiar Estado a EN_CURSO",
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": { "raw": "{{baseUrl}}/ordenes/{{ordenId}}", "host": ["{{baseUrl}}"], "path": ["ordenes", "{{ordenId}}"] },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"descripcionAveria\": \"Fallo en frenos delanteros\",\n  \"estado\": \"EN_CURSO\",\n  \"kilometros\": 45000,\n  \"precioEstimado\": 250.00,\n  \"precioFinal\": 230.00,\n  \"matriculaVehiculo\": \"{{vehiculoMatricula}}\"\n}"
+            }
+          },
+          "event": [{
+            "listen": "test",
+            "script": {
+              "exec": [
+                "pm.test('Status 200 OK', () => pm.response.to.have.status(200));",
+                "pm.test('Estado actualizado a EN_CURSO', () => {",
+                "  pm.expect(pm.response.json().estado).to.eql('EN_CURSO');",
+                "});"
+              ]
+            }
+          }]
+        },
+        {
+          "name": "PUT Cambiar Estado a FINALIZADO",
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": { "raw": "{{baseUrl}}/ordenes/{{ordenId}}", "host": ["{{baseUrl}}"], "path": ["ordenes", "{{ordenId}}"] },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"descripcionAveria\": \"Fallo en frenos delanteros — reparado\",\n  \"estado\": \"FINALIZADO\",\n  \"kilometros\": 45000,\n  \"precioEstimado\": 250.00,\n  \"precioFinal\": 230.00,\n  \"matriculaVehiculo\": \"{{vehiculoMatricula}}\"\n}"
+            }
+          },
+          "event": [{
+            "listen": "test",
+            "script": {
+              "exec": [
+                "pm.test('Status 200 OK', () => pm.response.to.have.status(200));",
+                "pm.test('Estado FINALIZADO', () => {",
+                "  pm.expect(pm.response.json().estado).to.eql('FINALIZADO');",
+                "});"
+              ]
+            }
+          }]
+        },
+        {
+          "name": "DELETE Orden",
+          "request": {
+            "method": "DELETE",
+            "url": { "raw": "{{baseUrl}}/ordenes/{{ordenId}}", "host": ["{{baseUrl}}"], "path": ["ordenes", "{{ordenId}}"] }
+          },
+          "event": [{
+            "listen": "test",
+            "script": {
+              "exec": [
+                "pm.test('Status 204 No Content', () => pm.response.to.have.status(204));"
+              ]
+            }
+          }]
+        }
+      ]
+    },
+    {
+      "name": "Usuarios",
+      "item": [
+        {
+          "name": "POST Crear Usuario",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": { "raw": "{{baseUrl}}/usuarios", "host": ["{{baseUrl}}"], "path": ["usuarios"] },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"tecnico01\",\n  \"password\": \"pass1234\",\n  \"nombre\": \"Pedro Martínez\",\n  \"rol\": \"TECNICO\",\n  \"activo\": true\n}"
+            }
+          },
+          "event": [{
+            "listen": "test",
+            "script": {
+              "exec": [
+                "pm.test('Status 201 Created', () => pm.response.to.have.status(201));",
+                "pm.test('Tiene id y username', () => {",
+                "  const body = pm.response.json();",
+                "  pm.expect(body).to.have.property('id');",
+                "  pm.expect(body.username).to.eql('tecnico01');",
+                "  pm.expect(body).to.not.have.property('password');",
+                "  pm.collectionVariables.set('usuarioId', body.id);",
+                "});"
+              ]
+            }
+          }]
+        },
+        {
+          "name": "POST Login Correcto",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": { "raw": "{{baseUrl}}/usuarios/login", "host": ["{{baseUrl}}"], "path": ["usuarios", "login"] },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"tecnico01\",\n  \"password\": \"pass1234\"\n}"
+            }
+          },
+          "event": [{
+            "listen": "test",
+            "script": {
+              "exec": [
+                "pm.test('Status 200 OK', () => pm.response.to.have.status(200));",
+                "pm.test('Login retorna usuario sin password', () => {",
+                "  const body = pm.response.json();",
+                "  pm.expect(body).to.have.property('username');",
+                "  pm.expect(body).to.not.have.property('password');",
+                "});"
+              ]
+            }
+          }]
+        },
+        {
+          "name": "POST Login Incorrecto — 401",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": { "raw": "{{baseUrl}}/usuarios/login", "host": ["{{baseUrl}}"], "path": ["usuarios", "login"] },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"tecnico01\",\n  \"password\": \"wrongpassword\"\n}"
+            }
+          },
+          "event": [{
+            "listen": "test",
+            "script": {
+              "exec": [
+                "pm.test('Status 401 Unauthorized', () => pm.response.to.have.status(401));",
+                "pm.test('ErrorResponse code 401', () => {",
+                "  pm.expect(pm.response.json().code).to.eql(401);",
+                "});"
+              ]
+            }
+          }]
+        },
+        {
+          "name": "GET Todos los Usuarios",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{baseUrl}}/usuarios", "host": ["{{baseUrl}}"], "path": ["usuarios"] }
+          },
+          "event": [{
+            "listen": "test",
+            "script": {
+              "exec": [
+                "pm.test('Status 200 OK', () => pm.response.to.have.status(200));",
+                "pm.test('Es un array', () => pm.expect(pm.response.json()).to.be.an('array'));"
+              ]
+            }
+          }]
+        },
+        {
+          "name": "GET Usuario por ID",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{baseUrl}}/usuarios/{{usuarioId}}", "host": ["{{baseUrl}}"], "path": ["usuarios", "{{usuarioId}}"] }
+          },
+          "event": [{
+            "listen": "test",
+            "script": {
+              "exec": [
+                "pm.test('Status 200 OK', () => pm.response.to.have.status(200));",
+                "pm.test('Sin password en respuesta', () => {",
+                "  pm.expect(pm.response.json()).to.not.have.property('password');",
+                "});"
+              ]
+            }
+          }]
+        },
+        {
+          "name": "PUT Modificar Usuario",
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": { "raw": "{{baseUrl}}/usuarios/{{usuarioId}}", "host": ["{{baseUrl}}"], "path": ["usuarios", "{{usuarioId}}"] },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"tecnico01\",\n  \"password\": \"newpass999\",\n  \"nombre\": \"Pedro Martínez Actualizado\",\n  \"rol\": \"ADMIN\",\n  \"activo\": true\n}"
+            }
+          },
+          "event": [{
+            "listen": "test",
+            "script": {
+              "exec": [
+                "pm.test('Status 200 OK', () => pm.response.to.have.status(200));",
+                "pm.test('Rol actualizado a ADMIN', () => {",
+                "  pm.expect(pm.response.json().rol).to.eql('ADMIN');",
+                "});"
+              ]
+            }
+          }]
+        },
+        {
+          "name": "DELETE Usuario",
+          "request": {
+            "method": "DELETE",
+            "url": { "raw": "{{baseUrl}}/usuarios/{{usuarioId}}", "host": ["{{baseUrl}}"], "path": ["usuarios", "{{usuarioId}}"] }
+          },
+          "event": [{
+            "listen": "test",
+            "script": {
+              "exec": [
+                "pm.test('Status 204 No Content', () => pm.response.to.have.status(204));"
+              ]
+            }
+          }]
+        }
+      ]
+    }
+  ]
+}
