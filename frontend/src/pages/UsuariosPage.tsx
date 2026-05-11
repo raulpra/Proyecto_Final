@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import type { Usuario, UsuarioInDto, AppRole } from '../types/usuario';
+import type { Usuario, UsuarioInDto } from '../types/usuario';
 import { API_BASE_URL } from '../data/constants';
 import ActionButton from '../components/ActionButton';
 import './ClientesPage.css';
